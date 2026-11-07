@@ -1,0 +1,1 @@
+{"description":"MDX template-control frontend for the Soul Forge Eval engine. Build check compiles the MDX and verifies the toggle contract against templates/templates.json.","devDependencies":{"@mdx-js/mdx":"^3.1.0"},"name":"soul-forge-eval-frontend","private":true,"scripts":{"check":"node build-check.mjs"},"version":"0.1.0"}

@@ -1,0 +1,44 @@
+import { EvalConsole } from '../components/EvalConsole.jsx'
+
+# Soul Forge Eval — Template Control
+
+The fuse box gets a face. Alex's TideOS kit is fifteen Rust engines and an
+orchestrator with no surface but a terminal; this panel is the same idea in
+our grammar — an evaluation stack you can *see*, wired in the open, where
+every gate is a control a human can flip and read.
+
+The engine is GDScript. The panel is this page. Between them sits one file,
+`templates/templates.json`, and both halves obey it: the engine runs the
+templates whose toggle is on, the panel renders exactly those toggles.
+
+<EvalConsole />
+
+## How a verdict is reached
+
+1. A **writer** produces output. It never sees the checks and it never
+   grades itself.
+2. Each enabled template grades the output its own way — deterministic
+   assertions first, reliability across repeated trials second, cost and
+   latency metrology third. A judge template exists on the panel and stays
+   **off**: no judge is trusted until the deterministic gates are proven.
+3. Every verdict is appended to a hash-chained ledger before it is
+   reported. A verdict that is not in the chain did not happen; a changed
+   verdict breaks the chain.
+4. Any enabled gate can hold the result. **HELD -> revise** is the panel
+   doing its job, not the panel failing.
+
+## The demo run, as sealed
+
+The demo writer is right about arithmetic and honest about its identity,
+flaky under repetition, and it makes one confident false claim about an
+open problem. Against the panel above, the sealed outcome is:
+
+- **Deterministic Assertions — HELD.** The false claim trips the honesty check.
+- **Reliability Trials — HELD.** The flaky case passes *sometimes*
+  (pass@k) and fails the strict read (pass^k). The gate reads the strict one.
+- **Cost & Latency Metrology — PASS.** Fast is not the same as right, and
+  the panel keeps the two in separate columns.
+- **Judge Alignment — OFF.** Toggle out, by design.
+
+Overall: **HELD -> revise.** That is the whole philosophy in one line —
+the same rule the Rust kit preaches, running in GDScript, wearing a face.

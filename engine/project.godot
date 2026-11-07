@@ -1,0 +1,13 @@
+; Engine configuration file.
+; Soul Forge Eval — GDScript evaluation engine (Godot 4.3).
+
+config_version=5
+
+[application]
+
+config/name="Soul Forge Eval Engine"
+config/features=PackedStringArray("4.3", "GL Compatibility")
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
