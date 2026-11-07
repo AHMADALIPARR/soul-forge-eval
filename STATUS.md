@@ -1,6 +1,6 @@
 # STATUS — Soul Forge Eval
 
-Local only; not pushed. Built 2026-11-07.
+Built 2026-11-07. Published 2026-11-07 as AHMADALIPARR/soul-forge-eval.
 
 ## Verified by execution on this machine
 
