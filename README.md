@@ -16,6 +16,16 @@ The console is published on GitHub Pages:
 
 It presents the messaging surface (roster, stream, inspector) together with the evaluation panel. Selecting **Run GDScript engine** loads the Godot 4.3 web export and invokes the same panel runner used by the headless CLI. The page does not recompute passes, trial counts, or hashes. Template toggles are transmitted as the contract; any seal that has been replaced fails the engine’s own verification.
 
+### Console overview
+
+![Soul Forge console (viewport)](media/console-viewport.png)
+
+The agents panel, message stream, and connection state are shown above. The full page, including the template-control eval panel, is below.
+
+### Full page
+
+![Soul Forge console (full page)](media/console-full.png)
+
 ## Design principles
 
 - **Separation of roles.** The writer proposes; templates judge. A judge template is recognised and refused by default until the deterministic gates have been proven in use.
