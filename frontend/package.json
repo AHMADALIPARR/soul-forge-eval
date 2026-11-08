@@ -1,1 +1,25 @@
-{"description":"MDX template-control frontend for the Soul Forge Eval engine. Build check compiles the MDX and verifies the toggle contract against templates/templates.json.","devDependencies":{"@mdx-js/mdx":"^3.1.0"},"name":"soul-forge-eval-frontend","private":true,"scripts":{"check":"node build-check.mjs"},"version":"0.1.0"}
+{
+  "description": "Soul Forge Eval frontend: a static React messaging console (Vite, GitHub Pages) plus the original MDX template-control page and its contract check.",
+  "devDependencies": {
+    "@mdx-js/mdx": "^3.1.0",
+    "@playwright/test": "^1.65.0",
+    "@vitejs/plugin-react": "^6.2.1",
+    "vite": "^8.3.6"
+  },
+  "name": "soul-forge-eval-frontend",
+  "private": true,
+  "scripts": {
+    "check": "node build-check.mjs",
+    "build": "vite build",
+    "preview": "vite preview --port 4173 --strictPort",
+    "test:unit": "node --test \"tests/unit/*.test.mjs\"",
+    "test:e2e": "playwright test",
+    "test": "npm run check && npm run test:unit && npm run build && npm run test:e2e"
+  },
+  "version": "0.1.0",
+  "dependencies": {
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "type": "module"
+}

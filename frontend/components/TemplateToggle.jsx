@@ -20,6 +20,7 @@ export function TemplateToggle({ template, onChange }) {
         type="button"
         role="switch"
         aria-checked={on}
+        aria-label={`${template.title} (${template.kind})`}
         className={on ? 'sf-toggle sf-toggle-on' : 'sf-toggle sf-toggle-off'}
         onClick={flip}
       >

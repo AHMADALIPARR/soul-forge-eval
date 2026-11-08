@@ -1,0 +1,68 @@
+{
+ "schema_version": "1",
+ "agents": [
+  {
+   "id": "x1",
+   "name": "<svg onload=\"window.__sf_xss=1\">",
+   "model": "[x](javascript:window.__sf_xss=1)",
+   "capability": null
+  },
+  {
+   "id": "x2",
+   "name": "Peer"
+  }
+ ],
+ "events": [
+  {
+   "schema_version": "1",
+   "event_id": "x-1",
+   "run_id": "X",
+   "sequence": 1,
+   "occurred_at": "2026-11-07T10:00:00Z",
+   "received_at": "2026-11-07T10:00:01Z",
+   "task_id": "T-xss",
+   "sender": "x1",
+   "recipient": "x2",
+   "kind": "message",
+   "message": "<img src=x onerror=\"window.__sf_xss=1\">",
+   "status": "delivered",
+   "source": "live",
+   "correlation_id": "c-1"
+  },
+  {
+   "schema_version": "1",
+   "event_id": "x-2",
+   "run_id": "X",
+   "sequence": 2,
+   "occurred_at": "2026-11-07T10:00:00Z",
+   "received_at": "2026-11-07T10:00:01Z",
+   "task_id": "T-1",
+   "sender": "x2",
+   "recipient": "x1",
+   "kind": "message",
+   "message": "[x](data:text/html,<script>window.__sf_xss=1</script>) ``` JaVaScRiPt:window.__sf_xss=1",
+   "status": "delivered",
+   "source": "recorded",
+   "correlation_id": "c-1"
+  },
+  {
+   "schema_version": "1",
+   "event_id": "x-3",
+   "run_id": "X",
+   "sequence": 3,
+   "occurred_at": "2026-11-07T10:00:00Z",
+   "received_at": "2026-11-07T10:00:01Z",
+   "task_id": "T-1",
+   "sender": "x1",
+   "recipient": "a2",
+   "kind": "activity",
+   "message": null,
+   "status": "working",
+   "source": "recorded",
+   "correlation_id": "c-1",
+   "activity_label": "thinking",
+   "progress_summary": "<svg onload=\"window.__sf_xss=1\">",
+   "private_reasoning": "SECRET-REASONING-SENTINEL"
+  }
+ ]
+}
