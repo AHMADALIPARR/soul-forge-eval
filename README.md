@@ -1,92 +1,64 @@
 # Soul Forge Eval
 
-An evaluation engine in GDScript with an MDX template-control frontend.
+An evaluation engine and console built on one rule: **agents don't
+grade their own work.** A writer proposes; separate templates judge;
+every verdict seals into a SHA-256 hash chain that refuses tampering.
 
-A writer produces output. This panel grades it. The writer never sees the
-checks and never grades itself; every verdict is appended to a hash-chained
-ledger before it is reported, and any enabled gate can hold the result —
-**HELD -> revise** — instead of letting it apply.
+## The engine (`engine/`)
 
-## The two halves
+GDScript on Godot 4.3, run headless. Template kinds:
 
-**Engine (`engine/`)** — a Godot 4 project. `eval_engine.gd` grades a
-subject (any Callable) under template kinds:
+- **deterministic-assertions** — exact / contains / key-equals /
+  numeric-close / length checks against the subject's output.
+- **reliability-trials** — pass@k reported beside pass^k; the gate
+  reads pass^k. A batch with zero trials is INVALID, never a pass.
+- **cost-latency-metrology** — per-case time and size budgets.
+- **judge-alignment** — recognised as a template kind and refused by
+  default. A judge is a separate seat or it is nothing.
 
-- `assertions` — deterministic checks: exact, contains, key-equals,
-  numeric tolerance, length bounds. No judge, no opinion.
-- `reliability` — N trials per case; reports pass@k beside pass^k and
-  the gate reads pass^k, the strict one.
-- `metrology` — per-case elapsed time and output size against a budget.
-- `judge` — recognised and refused by default: no judge is trusted until
-  the deterministic gates are proven.
+Verdicts append to a hash-chained log; a tampered chain fails
+verification. The demo subject is a deterministic stand-in: right on
+arithmetic, honest about its identity, flaky one time in four, and
+carrying one planted false claim — the panel's job is to catch it.
 
-`verdict_chain.gd` seals each verdict into an append-only SHA-256 chain.
-`demo_subject.gd` is a stand-in writer — right about arithmetic, honest
-about its identity, flaky under repetition, and wrong once, confidently,
-about an open problem — so the panel's trips are visible in its own demo.
-`main.gd` runs the engine's mechanics checks and then the demo panel,
-headless:
+## One contract (`templates/templates.json`)
 
-```
-godot --headless --path engine --script main.gd -- ../templates/templates.json
-```
+Which templates run is a toggle in one JSON file. The engine runs
+exactly the toggles that are on; both frontends render exactly those
+toggles. Nothing is hardcoded on either side.
 
-**Frontend (`frontend/`)** — the template control. `pages/eval-console.mdx`
-mounts `components/EvalConsole.jsx`, which renders one
-`TemplateToggle` per entry in `templates/templates.json`. The JSON file is
-the single source of truth for both halves: the engine runs the templates
-whose toggle is on; the panel renders exactly those toggles; nothing is
-hardcoded on either side. `console.css` carries the SnapOS panel language —
-near-black ground, thin borders, monospace readouts. Verify the contract
-with `npm run check` in `frontend/`.
+## The console (`frontend/src/`)
 
-## Reference
+A React + Vite messaging console — the swarm's own habitat, as a
+product surface: agent roster with per-agent models and states, a
+message stream where a failed delivery is shown as failed, per-agent
+temperature with requested-vs-effective kept separate, and a demo
+mode that is opt-in and labelled as demo. It starts Disconnected and
+empty; it claims no runtime it does not have. GitHub Pages serves
+this console (`.github/workflows/pages.yml`).
 
-The architecture reference is the TideOS Eval Kit by TechTide AI
-(TechTideOhio, MIT): fifteen decoupled Rust evaluation engines and the
-binnacle orchestrator. This project is the same separation — grader apart
-from graded, deterministic gates before judges, fail-closed — expressed in
-GDScript with a control surface.
+`frontend/pages/` and `frontend/components/` hold the stage-1 MDX
+template-control frontend; its contract check runs against the same
+`templates.json`.
 
-## Messaging console (frontend/src, static React build)
+## The build session (`media/swarm-build.mp4`)
 
-`frontend/src/` is a light, conversation-first console for agent-to-agent
-messages, built with React + Vite into a static site for GitHub Pages
-(base `/soul-forge-eval/`). The MDX page and its contract check above are
-unchanged and still run with `npm run check`.
+[The NOREPLY crew building this console](media/swarm-build.mp4) —
+Architect, Engineer, Mathematician, and Red Team seats working the
+blueprint, the semantics review, and the implementation, with their
+own confidence labels (Tested / Not proven / Not checked) left in.
 
-- **Honest sources.** This build ships with no runtime connected, so it
-  says *Runtime: Disconnected* and shows no messages. You can import a
-  recording (shown as *Recorded*, even if it was originally live) or opt in
-  to a demo, which carries a persistent DEMO banner and a sample label on
-  every message and is stored separately from recorded data.
-- **Versioned envelopes.** `src/lib/schema.js` validates AgentEvent v1,
-  TemperatureCapability v1, ConfigAck v1 and Recording v1. Events are
-  ordered by runtime sequence per run and source, deduplicated by
-  event_id; conflicts, stale, malformed and oversized events are
-  quarantined, and gaps are shown until filled or explicitly skipped.
-- **Public activity only.** Thinking/Working/Waiting tags and progress
-  summaries are what an agent reported; fields such as
-  `private_reasoning` are dropped and never rendered. Live activity that
-  has expired is shown as Unknown.
-- **Temperature.** Per agent, driven by the provider capability.
-  Requested (draft), pending and effective are separate; only a correlated
-  runtime acknowledgment changes the effective value, which otherwise reads
-  `not_applied`. Unsupported or unknown models cannot be set.
-- **Evaluation.** Template switches render from `templates/templates.json`
-  and edit a browser draft only. Reliability shows the engine's batch
-  booleans as observations, not estimators; a zero-trial template is
-  marked INVALID. The ledger is described as in-memory hash links: not
-  durable, not replay-safe, not authenticated.
-- **No backend.** No runtime, worker, VM or container is provided or
-  provisioned. A future runtime would plug in behind the adapter boundary
-  described in the design notes.
+## Verify
 
-```
-cd frontend
-npm ci
-npm run check        # original MDX + toggle contract
-npm run test:unit    # node --test: ordering, schemas, temperature, semantics
-npm run build        # vite production build -> dist/
-npm run test:e2e     # Playwright on the built site, desktop + mobile, screenshots
-```
+- Engine: `engine/` under Godot 4.3 headless (`main.gd`) — mechanics
+  suite plus the demo panel.
+- Console: in `frontend/` — `npm run check` (contract), `npm run
+  test:unit`, `npm run build`, `npm run test:e2e` (Playwright).
+
+Architecture reference: the TideOS Eval Kit (TechTideOhio, MIT) —
+decoupled engines behind a fail-closed orchestrator. This repo is
+the counterpart in GDScript and React: same separation, verdicts
+sealed.
+
+License: SNAPKITTY OPAQUE SOURCE LICENSE v1.0 — see `LICENSE`.
+Owners: Nova Parr, Ahmad Ali Parr, and Team HoloTwinKitty.

@@ -1,32 +1,41 @@
 # STATUS — Soul Forge Eval
 
-Built 2026-11-07. Published 2026-11-07 as AHMADALIPARR/soul-forge-eval.
+Public: AHMADALIPARR/soul-forge-eval (published 2026-11-07).
 
-## Verified by execution on this machine
+## Verified by execution (2026-11-07, after the console merge)
 
-- Engine mechanics (Godot 4.3 headless, `engine/main.gd`): 8/8 checks
-  pass — exact/contains/key-equals/numeric-close checks hold and trip
-  correctly; verdict chain verifies; a tampered chain is refused.
-- Demo panel run against `templates/templates.json`: assertions HELD
-  (planted false claim), reliability HELD (flaky case: pass@k true,
-  pass^k false), metrology PASS, judge template skipped (toggle off).
-  Chain valid, 3 sealed verdicts (one per enabled template). Overall
-  HELD -> revise, exit code 0: the hold is the gate working.
-- Frontend (`npm run check`): 8/8 — the MDX page compiles; the toggle
-  contract holds (unique ids, enabled flags, engine-spoken kinds,
-  data-driven console, no hardcoded template ids).
+- Engine mechanics (Godot 4.3 headless, `engine/main.gd`): checks
+  hold and trip correctly; the verdict chain verifies; a tampered
+  chain is refused. Demo panel: deterministic-assertions HELD (the
+  planted false claim), reliability-trials HELD (pass@k true /
+  pass^k false on the flaky case), cost-latency-metrology PASS,
+  judge-alignment OFF by toggle; overall HELD -> revise. The hold
+  is the gate working, not a failure.
+- Console contract check (`frontend`, `npm run check`): all green —
+  the MDX frontend and the engine agree on `templates/templates.json`.
+- Console unit tests (`npm run test:unit`): 22/22 pass, including
+  zero-trial reliability = INVALID, hostile-recording inertness, and
+  requested-vs-effective temperature semantics.
+- Console build (`npm run build`): clean Vite production build.
+- Console e2e (`npm run test:e2e`, Playwright + Chromium, desktop
+  and mobile projects): 14/14 pass.
 
-## Limits
+## Limits, stated plainly
 
-- The subject under evaluation is a deterministic stand-in, not a live
-  model. Wiring a real worker (an Ollama seat, a swarm role) behind the
-  subject Callable is the next stage and has not been done.
-- The MDX frontend is compile- and contract-verified only; it has not
-  been rendered in a browser or served by a site generator here.
-- The verdict chain's canonical form is insertion-ordered JSON within a
-  run; cross-process persistence of chains is a later stage.
-- Metrology budget (50 ms/case default) is calibrated for the demo
-  subject's trivial work, not for model inference.
+- The evaluated subject is a deterministic stand-in. Wiring a live
+  model seat (Ollama / swarm endpoint) behind the subject Callable
+  is future work; no runtime is connected to the console, and the
+  console says so (Runtime: Disconnected).
+- Console demo data is sample data, labelled as demo in the UI.
+  In demo mode the temperature Apply control is a simulation; the
+  effective state reads not_applied.
 - The judge template kind is a recognised refusal, not an
-  implementation: it exists on the panel so the decision to keep judges
-  out is a visible control, not an absence.
+  implementation.
+- The engine's verdict chain canonical form is insertion-ordered
+  JSON within a run; cross-process persistence is future work.
+- Metrology budgets are calibrated to the demo subject, not to
+  model inference.
+- GitHub Pages: `.github/workflows/pages.yml` builds and deploys
+  `frontend/dist` on push to main. Until the first workflow run
+  lands, the site URL serves the default Jekyll rendering of this
+  repository's README instead of the console.
