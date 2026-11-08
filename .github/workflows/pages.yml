@@ -26,20 +26,24 @@ jobs:
         with:
           node-version: 24
           cache: npm
-          cache-dependency-path: frontend/package-lock.json
-      - name: Install and verify
+          cache-dependency-path: |
+            frontend/package-lock.json
+            web/package-lock.json
+      - name: Verify the document frontend
         working-directory: frontend
         run: |
           npm ci
           npm run check
-      - name: Build
-        working-directory: frontend
-        run: npm run build
+      - name: Build the live console
+        working-directory: web
+        run: |
+          npm ci
+          npm run build
       - uses: actions/configure-pages@v5
         with:
           enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: frontend/dist
+          path: web/dist
       - id: deploy
         uses: actions/deploy-pages@v4

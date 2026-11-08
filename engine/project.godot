@@ -6,6 +6,8 @@ config_version=5
 [application]
 
 config/name="Soul Forge Eval Engine"
+config/description="Agents do not grade their own work. Verdicts are hash-chained."
+run/main_scene="res://web_host.tscn"
 config/features=PackedStringArray("4.3", "GL Compatibility")
 
 [rendering]

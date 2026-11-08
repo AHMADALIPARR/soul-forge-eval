@@ -13,28 +13,27 @@
   Reliability Trials HELD (the flaky case fails pass^k), Cost &
   Latency Metrology PASS, Judge Alignment OFF, verdict chain valid
   with 3 sealed verdicts. Overall: HELD -> revise.
-- The front end (`frontend/`): `npm run check` builds the static
-  site from `pages/console.mdx` and asserts the contract against
-  the built output — no script ships, the demo banner and the
-  Disconnected runtime state render, the effective temperature
-  reads not_applied, every agent and recorded message from
-  `data/demo-recording.json` renders, the four template toggles
-  match `templates/templates.json`, and a hostile recording fixture
-  renders as escaped text. The built page was rendered in headless
-  Chromium and visually compared with the console design.
-- The Pages workflow runs the contract check and the build on
-  every push to main and deploys `frontend/dist`.
+- The document front end (`frontend/`): `npm run check` builds static
+  HTML from `pages/console.mdx` and asserts the contract — no script
+  in that build, the demo banner and the Disconnected runtime state
+  render, the four template toggles match `templates/templates.json`.
+  That build is a contract check. It is not the Pages site.
+- The live console (`web/`): React, published by the Pages workflow
+  from `web/dist`. Run GDScript engine boots the Godot 4.3 web export
+  (`web/public/godot/`, threads off) and sends the template contract
+  to `web_host.gd`, which calls the same panel runner as the CLI.
+  The page displays the sealed report. It does not grade.
+- The Pages workflow, on every push to main, runs the document
+  contract check, builds `web/`, and deploys `web/dist`.
 
 ## Shape
 
-- One implementation of the semantics: the GDScript engine. The
-  front end displays the contract (`templates/templates.json`) and
-  the recording data; it contains no second implementation of
-  evaluation, event storage, schema, or temperature logic.
-- The front end is documents: MDX compiled at build time to static
-  HTML + CSS. Controls that would need a runtime (apply a
-  temperature, import a recording) are shown disabled with the
-  reason stated; nothing is simulated.
+- One implementation of the semantics: the GDScript engine, both
+  headless (`main.gd`) and in the browser (`web_host.gd` → the same
+  `panel_runner.gd`). The live page sends the contract and renders
+  the seal. It contains no second implementation of evaluation.
+- `frontend/` stays documents: MDX compiled at build time to static
+  HTML + CSS, checked on every Pages run, not deployed.
 
 ## Limits
 

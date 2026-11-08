@@ -27,19 +27,20 @@ Which templates run is a toggle in one JSON file. The engine runs
 exactly the toggles that are on; both frontends render exactly those
 toggles. Nothing is hardcoded on either side.
 
-## The console (`frontend/src/`)
+## The console
 
-A React + Vite messaging console — the swarm's own habitat, as a
-product surface: agent roster with per-agent models and states, a
-message stream where a failed delivery is shown as failed, per-agent
-temperature with requested-vs-effective kept separate, and a demo
-mode that is opt-in and labelled as demo. It starts Disconnected and
-empty; it claims no runtime it does not have. GitHub Pages serves
-this console (`.github/workflows/pages.yml`).
+GitHub Pages serves the live console in `web/`: the messaging surface
+(roster, stream, inspector) plus the eval panel. **Run GDScript
+engine** loads the Godot 4.3 web export and asks the same runner the
+CLI uses. The page does not recompute a pass, a trial count, or a
+hash. Toggles are sent as the contract; a seal that is replaced fails
+the engine's own verify.
 
-`frontend/pages/` and `frontend/components/` hold the stage-1 MDX
-template-control frontend; its contract check runs against the same
-`templates.json`.
+`frontend/` is the script-free document render of the same console.
+Its contract check still runs in the Pages workflow. It is not what
+Pages publishes.
+
+Live: https://ahmadaliparr.github.io/soul-forge-eval/
 
 ## The build session (`media/swarm-build.mp4`)
 
@@ -51,9 +52,10 @@ own confidence labels (Tested / Not proven / Not checked) left in.
 ## Verify
 
 - Engine: `engine/` under Godot 4.3 headless (`main.gd`) — mechanics
-  suite plus the demo panel.
-- Console: in `frontend/` — `npm run check` (contract), `npm run
-  test:unit`, `npm run build`, `npm run test:e2e` (Playwright).
+  suite plus the demo panel. The browser build is `web/public/godot/`
+  (threads off), driven by `web_host.gd`.
+- Document frontend: in `frontend/` — `npm run check`.
+- Live console: in `web/` — `npm run build`. Pages deploys `web/dist`.
 
 Architecture reference: the TideOS Eval Kit (TechTideOhio, MIT) —
 decoupled engines behind a fail-closed orchestrator. This repo is
