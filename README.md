@@ -1,71 +1,77 @@
 # Soul Forge Eval
 
 [![License: SnapKitty Opaque 1.0](https://img.shields.io/badge/license-SnapKitty%20Opaque%201.0-blue)](LICENSE)
-[![Godot](https://img.shields.io/badge/Godot-4.3-478cbf)](https://godotengine.org/)
+[![Godot 4.3](https://img.shields.io/badge/Godot-4.3-478cbf)](https://godotengine.org/)
 [![Live Console](https://img.shields.io/badge/live-console-brightgreen)](https://ahmadaliparr.github.io/soul-forge-eval/)
 
-**Canonical repository:** https://github.com/AHMADALIPARR/soul-forge-eval
+**Canonical repository:** [github.com/AHMADALIPARR/soul-forge-eval](https://github.com/AHMADALIPARR/soul-forge-eval)
 
-An evaluation engine and console built on one rule: **agents do not grade their own work.** A writer proposes; separate templates judge; every verdict seals into a SHA-256 hash chain that refuses tampering.
+An evaluation engine and console whose governing rule is that **agents do not grade their own work**. A writer produces output; independent templates judge it; every verdict is appended to a SHA-256 hash chain that rejects tampering.
 
 ## Live console
 
-The live console is served from GitHub Pages:
+The console is published on GitHub Pages:
 
-**https://ahmadaliparr.github.io/soul-forge-eval/**
+**[ahmadaliparr.github.io/soul-forge-eval](https://ahmadaliparr.github.io/soul-forge-eval/)**
 
-It shows the messaging surface (roster, stream, inspector) plus the eval panel. **Run GDScript engine** loads the Godot 4.3 web export and asks the same runner the CLI uses. The page does not recompute a pass, a trial count, or a hash. Toggles are sent as the contract; a seal that is replaced fails the engine’s own verify.
+It presents the messaging surface (roster, stream, inspector) together with the evaluation panel. Selecting **Run GDScript engine** loads the Godot 4.3 web export and invokes the same panel runner used by the headless CLI. The page does not recompute passes, trial counts, or hashes. Template toggles are transmitted as the contract; any seal that has been replaced fails the engine’s own verification.
+
+## Design principles
+
+- **Separation of roles.** The writer proposes; templates judge. A judge template is recognised and refused by default until the deterministic gates have been proven in use.
+- **Fail-closed verification.** A zero-trial reliability run is INVALID. An empty batch is INVALID. A tampered hash chain fails verification.
+- **Single contract.** Which templates execute is controlled exclusively by `templates/templates.json`. The engine and both frontends honour exactly the same toggles.
+- **One implementation.** Evaluation semantics exist only in the GDScript engine. The browser host and the document frontend do not reimplement grading.
 
 ## Architecture
 
-| Component | Location | Role |
-|-----------|----------|------|
-| Engine | `engine/` | GDScript on Godot 4.3, run headless or as a web export |
-| Templates contract | `templates/templates.json` | Single source of which templates are enabled |
-| Live console | `web/` | React UI published to GitHub Pages |
-| Document frontend | `frontend/` | Script-free MDX render used for contract checks |
-| Demo subject | `engine/demo_subject.gd` | Deterministic stand-in with planted flaws |
+| Component | Path | Purpose |
+|-----------|------|---------|
+| Engine | `engine/` | GDScript (Godot 4.3), run headless or as a web export |
+| Template contract | `templates/templates.json` | Sole source of enabled templates |
+| Live console | `web/` | React application deployed to GitHub Pages |
+| Document frontend | `frontend/` | Script-free MDX render used for contract verification |
+| Demo subject | `engine/demo_subject.gd` | Deterministic stand-in containing known flaws |
 
 ### Template kinds
 
-- **deterministic-assertions** — exact / contains / key-equals / numeric-close / length checks against the subject’s output.
-- **reliability-trials** — pass@k reported beside pass^k; the gate reads pass^k. A batch with zero trials is INVALID, never a pass.
-- **cost-latency-metrology** — per-case time and size budgets.
-- **judge-alignment** — recognised as a template kind and refused by default. A judge is a separate seat or it is nothing.
+| Kind | Behaviour |
+|------|-----------|
+| `deterministic-assertions` | Exact match, substring, key-equals, numeric-close, and length checks against the subject’s output. |
+| `reliability-trials` | Each case is executed N times. Reports pass@k alongside pass^k; the gate uses pass^k. A batch with zero trials is INVALID. |
+| `cost-latency-metrology` | Per-case elapsed time and output size measured against a budget. |
+| `judge-alignment` | Recognised as a template kind and disabled by default. A judge is a separate seat or it is not used. |
 
-Verdicts append to a hash-chained log; a tampered chain fails verification.
+Verdicts are appended to a hash-chained log. Any modification to a sealed entry causes verification to fail.
 
-The demo subject is a deterministic stand-in: right on arithmetic, honest about its identity, flaky one time in four, and carrying one planted false claim — the panel’s job is to catch it.
+The included demo subject is correct on arithmetic, honest about its identity, flaky on one trial in four, and contains one planted false claim. The panel is expected to detect the planted claim and the reliability failure.
 
-## One contract
+## Verification
 
-Which templates run is a toggle in `templates/templates.json`. The engine runs exactly the toggles that are on; both frontends render exactly those toggles. Nothing is hardcoded on either side.
+| Target | Command / location | Notes |
+|--------|--------------------|-------|
+| Engine | Godot 4.3 headless on `engine/main.gd` | Mechanics suite and demo panel |
+| Browser host | `web/public/godot/` (threads disabled) driven by `web_host.gd` | Calls the same panel runner as the CLI |
+| Document frontend | `frontend/` → `npm run check` | Contract check; not the published site |
+| Live console | `web/` → `npm run build` | GitHub Pages deploys `web/dist` |
 
-## Verify
+Current verification results are recorded in [STATUS.md](STATUS.md).
 
-- **Engine:** `engine/` under Godot 4.3 headless (`main.gd`) — mechanics suite plus the demo panel. The browser build is `web/public/godot/` (threads off), driven by `web_host.gd`.
-- **Document frontend:** in `frontend/` — `npm run check`.
-- **Live console:** in `web/` — `npm run build`. Pages deploys `web/dist`.
+## Build recording
 
-## Status
+A recording of the construction session is available at [media/swarm-build.mp4](media/swarm-build.mp4). It shows the Architect, Engineer, Mathematician, and Red Team seats working the blueprint, semantics review, and implementation, with confidence labels (Tested / Not proven / Not checked) retained.
 
-See [STATUS.md](STATUS.md) for what has been verified in this workspace (mechanics 13/13, demo panel results, frontend contract check, Pages workflow).
+## Related work
 
-## Build session
-
-[The NOREPLY crew building this console](media/swarm-build.mp4) — Architect, Engineer, Mathematician, and Red Team seats working the blueprint, the semantics review, and the implementation, with their own confidence labels (Tested / Not proven / Not checked) left in.
-
-## Architecture reference
-
-The TideOS Eval Kit (TechTideOhio, MIT) — decoupled engines behind a fail-closed orchestrator. This repo is the counterpart in GDScript and React: same separation, verdicts sealed.
+The design follows the separation used by the TideOS Eval Kit (TechTideOhio, MIT): decoupled engines behind a fail-closed orchestrator. This repository realises the same separation in GDScript and React, with verdicts sealed by a hash chain.
 
 ## License
 
-SNAPKITTY OPAQUE SOURCE LICENSE v1.0 — see [LICENSE](LICENSE).
+This project is licensed under the SNAPKITTY OPAQUE SOURCE LICENSE v1.0. See [LICENSE](LICENSE).
 
 Owners: Nova Parr, Ahmad Ali Parr, and Team HoloTwinKitty.
 
 ---
 
-**Repository:** https://github.com/AHMADALIPARR/soul-forge-eval  
-**Live console:** https://ahmadaliparr.github.io/soul-forge-eval/
+**Repository:** [github.com/AHMADALIPARR/soul-forge-eval](https://github.com/AHMADALIPARR/soul-forge-eval)  
+**Live console:** [ahmadaliparr.github.io/soul-forge-eval](https://ahmadaliparr.github.io/soul-forge-eval/)
