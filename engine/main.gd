@@ -33,8 +33,23 @@ func self_tests() -> void:
 	c.append({"verdict": "one"})
 	c.append({"verdict": "two"})
 	expect("verdict chain verifies", c.verify())
+	expect("chain entries are numbered in order", int(c.entries[0]["seq"]) == 1 and int(c.entries[1]["seq"]) == 2)
+	c.entries[1]["seq"] = 7
+	expect("renumbered entry is refused", not c.verify())
+	c.entries[1]["seq"] = 2
 	c.entries[0]["seal"] = "0".repeat(64)
 	expect("tampered chain is refused", not c.verify())
+	# SF-SEMANTICS: vacuous batches are INVALID, never passes.
+	var eng: RefCounted = EvalEngineT.new()
+	var subj: RefCounted = DemoSubjectT.new()
+	var call := Callable(subj, "produce")
+	var one_case: Array = [{"id": "x", "input": {"mode": "arith", "a": 2, "b": 3}, "checks": [{"kind": "key_equals", "key": "answer", "expected": "6"}]}]
+	var v0: Dictionary = eng.run_template({"id": "rel-zero", "kind": "reliability", "enabled": true, "trials": 0}, one_case, call)
+	expect("zero-trial reliability is INVALID, not a pass", not bool(v0["passed"]) and v0.has("invalid"))
+	var v1: Dictionary = eng.run_template({"id": "empty-batch", "kind": "assertions", "enabled": true}, [], call)
+	expect("empty assertions batch is INVALID, not a pass", not bool(v1["passed"]) and v1.has("invalid"))
+	var v2: Dictionary = eng.run_template({"id": "met", "kind": "metrology", "enabled": true, "budget_usec_per_case": 50000}, one_case, call)
+	expect("metrology verdict labels timings as observations", String(v2["detail"].get("observation", "")).contains("observations, not estimators"))
 
 func load_templates() -> Array:
 	var args := OS.get_cmdline_user_args()

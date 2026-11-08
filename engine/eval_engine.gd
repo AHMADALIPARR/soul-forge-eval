@@ -61,6 +61,14 @@ func run_template(template: Dictionary, cases: Array, subject: Callable) -> Dict
 	if not bool(template.get("enabled", false)):
 		verdict["detail"] = {"skipped": "toggle off"}
 		return verdict
+	# SF-SEMANTICS fix, all kinds: an empty batch proves nothing.
+	# any/all over zero cases or zero trials is a vacuous truth, so
+	# the verdict is INVALID — sealed as invalid, never as a pass.
+	if cases.is_empty() and kind != "judge":
+		verdict["invalid"] = "no cases — an empty batch is INVALID, never a pass"
+		verdict["detail"] = {"cases": []}
+		chain.append(verdict)
+		return verdict
 	match kind:
 		"assertions":
 			var graded: Array = []
@@ -73,19 +81,23 @@ func run_template(template: Dictionary, cases: Array, subject: Callable) -> Dict
 			verdict["detail"] = {"cases": graded}
 		"reliability":
 			var trials := int(template.get("trials", 4))
-			var any_pass_all := true
+			var valid := trials > 0
+			var any_pass_all := valid
 			var per_case: Array = []
 			for c in cases:
 				var wins := 0
-				for _i in trials:
-					var g := grade_case(c, subject)
-					if bool(g["passed"]):
-						wins += 1
-				var pass_at_k := wins > 0
-				var pass_pow_k := wins == trials
+				if valid:
+					for _i in trials:
+						var g := grade_case(c, subject)
+						if bool(g["passed"]):
+							wins += 1
+				var pass_at_k := valid and wins > 0
+				var pass_pow_k := valid and wins == trials
 				any_pass_all = any_pass_all and pass_pow_k
-				per_case.append({"case": c.get("id", ""), "trials": trials, "wins": wins, "pass_at_k": pass_at_k, "pass_pow_k": pass_pow_k})
+				per_case.append({"case": c.get("id", ""), "trials": trials, "wins": wins, "valid": valid, "pass_at_k": pass_at_k, "pass_pow_k": pass_pow_k})
 			verdict["passed"] = any_pass_all
+			if not valid:
+				verdict["invalid"] = "zero trials — pass^k over no runs is vacuous; INVALID, never a pass"
 			verdict["detail"] = {"cases": per_case}
 		"metrology":
 			var budget := int(template.get("budget_usec_per_case", 50000))
@@ -100,7 +112,11 @@ func run_template(template: Dictionary, cases: Array, subject: Callable) -> Dict
 				within = within and ok
 				rows.append({"case": c.get("id", ""), "usec": dt, "size": size, "within_budget": ok})
 			verdict["passed"] = within
-			verdict["detail"] = {"budget_usec_per_case": budget, "cases": rows}
+			# SF-SEMANTICS fix: timings are labelled in the sealed
+			# verdict as what they are — observations from one
+			# machine at one moment, not estimators, and not
+			# reproducible from a seed alone.
+			verdict["detail"] = {"budget_usec_per_case": budget, "cases": rows, "observation": "live timings are observations, not estimators; they are not reproducible from seed alone"}
 		"judge":
 			verdict["detail"] = {"refused": "judge templates stay off until the deterministic gates are proven"}
 		_:

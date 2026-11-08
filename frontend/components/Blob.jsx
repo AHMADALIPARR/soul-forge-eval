@@ -1,9 +1,11 @@
 import React from 'react'
 
-// Original, deterministic soft blob per agent id. Shape and hue derive from
-// a hash of the id, so each agent keeps a stable, distinct look. Purely
-// decorative: the agent's name and status are always shown as text.
-
+/**
+ * AgentBlob — the crew's deterministic soft blob per agent id, kept as
+ * pure presentation. Shape and hue derive from a hash of the id, so
+ * each agent keeps a stable, distinct look. Rendered at build time;
+ * the animation is CSS (styles.css), never script.
+ */
 export function hashId(id) {
   let h = 2166136261
   for (let i = 0; i < id.length; i++) { h ^= id.charCodeAt(i); h = Math.imul(h, 16777619) }
@@ -18,7 +20,6 @@ export function blobPath(id, points = 7) {
     const r = 34 + (((h >>> (i * 4)) & 15) / 15) * 10
     pts.push([50 + Math.cos(a) * r, 50 + Math.sin(a) * r])
   }
-  // Closed Catmull-Rom spline -> cubic Béziers for a smooth silhouette.
   let d = `M${pts[0][0].toFixed(1)},${pts[0][1].toFixed(1)}`
   for (let i = 0; i < points; i++) {
     const p0 = pts[(i - 1 + points) % points], p1 = pts[i], p2 = pts[(i + 1) % points], p3 = pts[(i + 2) % points]
@@ -29,12 +30,8 @@ export function blobPath(id, points = 7) {
   return d + 'Z'
 }
 
-export function agentHue(id) {
-  return hashId(id) % 360
-}
-
 export function AgentBlob({ id, activity = 'idle', size = 40 }) {
-  const hue = agentHue(id)
+  const hue = hashId(id) % 360
   const gid = `sfb-${hashId(id).toString(36)}`
   return (
     <span className="sf-blob" data-activity={activity} style={{ width: size, height: size }} aria-hidden="true">
@@ -47,7 +44,6 @@ export function AgentBlob({ id, activity = 'idle', size = 40 }) {
           </radialGradient>
         </defs>
         <path className="sf-blob-shape" d={blobPath(id)} fill={`url(#${gid})`} />
-        <path className="sf-blob-shape sf-blob-glow" d={blobPath(id + '~', 6)} fill={`hsl(${hue} 80% 96%)`} opacity="0.45" transform="translate(10 8) scale(0.6)" />
       </svg>
     </span>
   )

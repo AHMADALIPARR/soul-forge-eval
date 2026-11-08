@@ -1,31 +1,28 @@
-import React, { useState } from 'react'
+import React from 'react'
 
 /**
- * TemplateToggle — the template control. One switch per eval template.
+ * TemplateToggle — the template control, rendered statically.
+ *
  * The switch state IS the template's `enabled` flag in
  * templates/templates.json: the GDScript engine runs the templates
- * whose toggle is on, and skips the rest without sealing a verdict.
- * Flipping a toggle here and in the JSON are the same act.
+ * whose toggle is on and skips the rest without sealing a verdict.
+ * This page is a static render, so the switch is shown, not wired —
+ * changing the state means editing the JSON, and the engine and
+ * this panel both obey the file. Nothing here pretends a click
+ * reached the engine.
  */
-export function TemplateToggle({ template, onChange }) {
-  const [on, setOn] = useState(template.enabled)
-  const flip = () => {
-    const next = !on
-    setOn(next)
-    if (onChange) onChange(template.id, next)
-  }
+export function TemplateToggle({ template }) {
+  const on = Boolean(template.enabled)
   return (
     <div className="sf-toggle-row" data-template-id={template.id}>
-      <button
-        type="button"
+      <span
         role="switch"
         aria-checked={on}
         aria-label={`${template.title} (${template.kind})`}
         className={on ? 'sf-toggle sf-toggle-on' : 'sf-toggle sf-toggle-off'}
-        onClick={flip}
       >
         <span className="sf-toggle-knob" />
-      </button>
+      </span>
       <div className="sf-toggle-text">
         <div className="sf-toggle-title">
           {template.title} <span className="sf-toggle-kind">{template.kind}</span>

@@ -1,0 +1,57 @@
+# Soul Forge Eval — the console
+
+The setup is a messaging console: an agent roster, a message stream
+where a failed delivery is shown as failed, and a panel that keeps
+what was *requested* separate from what is *effective*. This page is
+that setup rendered from data — MDX and CSS only, no client script.
+The recording below is the labelled demo sample; the runtime state
+is Disconnected because no runtime is connected to a static page,
+and the page says so instead of simulating one.
+
+<Console />
+
+## The eval panel — one contract
+
+Under the console sits the panel. The engine is GDScript
+(`engine/`); between the engine and this page sits one file,
+`templates/templates.json`, and both halves obey it: the engine
+runs the templates whose toggle is on, the panel renders exactly
+those toggles. The semantics — what a pass is, what a hold is —
+live in the engine alone; nothing on this page re-implements them.
+
+<EvalConsole />
+
+## How a verdict is reached
+
+1. A **writer** produces output. It never sees the checks and it
+   never grades itself.
+2. Each enabled template grades the output its own way —
+   deterministic assertions first, reliability across repeated
+   trials second, cost and latency metrology third. A batch with
+   no cases, or a reliability run with no trials, is **INVALID**,
+   never a pass. A judge template exists on the panel and stays
+   **off**: no judge is trusted until the deterministic gates are
+   proven.
+3. Every verdict is appended to a numbered, hash-chained ledger
+   before it is reported. A verdict that is not in the chain did
+   not happen; a changed or renumbered verdict breaks the chain.
+4. Any enabled gate can hold the result. **HELD -> revise** is the
+   panel doing its job, not the panel failing.
+
+## The demo run, as sealed
+
+The demo writer is right about arithmetic and honest about its
+identity, flaky under repetition, and it makes one confident false
+claim about an open problem. Against the panel above, the sealed
+outcome is:
+
+- **Deterministic Assertions — HELD.** The false claim trips the
+  honesty check.
+- **Reliability Trials — HELD.** The flaky case passes *sometimes*
+  (pass@k) and fails the strict read (pass^k). The gate reads the
+  strict one.
+- **Cost & Latency Metrology — PASS.** The timings are recorded as
+  observations, not estimators.
+- **Judge Alignment — OFF.** Toggle out, by design.
+
+Overall: **HELD -> revise.**

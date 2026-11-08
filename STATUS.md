@@ -1,41 +1,50 @@
-# STATUS — Soul Forge Eval
+# STATUS
 
-Public: AHMADALIPARR/soul-forge-eval (published 2026-11-07).
+## What runs, verified in this workspace
 
-## Verified by execution (2026-11-07, after the console merge)
+- The GDScript engine (`engine/`, Godot 4.3 headless): mechanics
+  checks 13/13 — the five assertion kinds, the hash-chained verdict
+  ledger (entries numbered, renumbering refused, tampering
+  refused), and the semantics-audit fixes: a zero-trial reliability
+  run is INVALID, an empty batch is INVALID, and metrology verdicts
+  seal their timings labelled as observations, not estimators.
+- The demo panel on the demo writer: Deterministic Assertions
+  HELD (the planted false claim trips the honesty check),
+  Reliability Trials HELD (the flaky case fails pass^k), Cost &
+  Latency Metrology PASS, Judge Alignment OFF, verdict chain valid
+  with 3 sealed verdicts. Overall: HELD -> revise.
+- The front end (`frontend/`): `npm run check` builds the static
+  site from `pages/console.mdx` and asserts the contract against
+  the built output — no script ships, the demo banner and the
+  Disconnected runtime state render, the effective temperature
+  reads not_applied, every agent and recorded message from
+  `data/demo-recording.json` renders, the four template toggles
+  match `templates/templates.json`, and a hostile recording fixture
+  renders as escaped text. The built page was rendered in headless
+  Chromium and visually compared with the console design.
+- The Pages workflow runs the contract check and the build on
+  every push to main and deploys `frontend/dist`.
 
-- Engine mechanics (Godot 4.3 headless, `engine/main.gd`): checks
-  hold and trip correctly; the verdict chain verifies; a tampered
-  chain is refused. Demo panel: deterministic-assertions HELD (the
-  planted false claim), reliability-trials HELD (pass@k true /
-  pass^k false on the flaky case), cost-latency-metrology PASS,
-  judge-alignment OFF by toggle; overall HELD -> revise. The hold
-  is the gate working, not a failure.
-- Console contract check (`frontend`, `npm run check`): all green —
-  the MDX frontend and the engine agree on `templates/templates.json`.
-- Console unit tests (`npm run test:unit`): 22/22 pass, including
-  zero-trial reliability = INVALID, hostile-recording inertness, and
-  requested-vs-effective temperature semantics.
-- Console build (`npm run build`): clean Vite production build.
-- Console e2e (`npm run test:e2e`, Playwright + Chromium, desktop
-  and mobile projects): 14/14 pass.
+## Shape
 
-## Limits, stated plainly
+- One implementation of the semantics: the GDScript engine. The
+  front end displays the contract (`templates/templates.json`) and
+  the recording data; it contains no second implementation of
+  evaluation, event storage, schema, or temperature logic.
+- The front end is documents: MDX compiled at build time to static
+  HTML + CSS. Controls that would need a runtime (apply a
+  temperature, import a recording) are shown disabled with the
+  reason stated; nothing is simulated.
 
-- The evaluated subject is a deterministic stand-in. Wiring a live
-  model seat (Ollama / swarm endpoint) behind the subject Callable
-  is future work; no runtime is connected to the console, and the
-  console says so (Runtime: Disconnected).
-- Console demo data is sample data, labelled as demo in the UI.
-  In demo mode the temperature Apply control is a simulation; the
-  effective state reads not_applied.
-- The judge template kind is a recognised refusal, not an
-  implementation.
-- The engine's verdict chain canonical form is insertion-ordered
-  JSON within a run; cross-process persistence is future work.
-- Metrology budgets are calibrated to the demo subject, not to
-  model inference.
-- GitHub Pages: `.github/workflows/pages.yml` builds and deploys
-  `frontend/dist` on push to main. Until the first workflow run
-  lands, the site URL serves the default Jekyll rendering of this
-  repository's README instead of the console.
+## Limits
+
+- The demo subject is a deterministic stand-in. Wiring a live
+  runtime (an Ollama endpoint, a Soul Forge session) behind the
+  console is future work; until then the honest runtime state is
+  Disconnected.
+- The verdict chain's canonical form is JSON.stringify of each
+  record in insertion order within a run; cross-run chain
+  verification is future work.
+- The judge template kind is recognised and refused by default;
+  implementing judge grading is future work, gated on the
+  deterministic templates being proven in real use.
